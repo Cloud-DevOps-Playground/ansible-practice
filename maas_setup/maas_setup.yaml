@@ -1,0 +1,33 @@
+---
+- name: A simple playbook example
+  hosts: maas-server
+  user: ubuntu
+  become: yes
+
+  tasks:
+    - name: Print ansible_hostname
+      debug:
+        msg: "Ansible hostname: {{ ansible_hostname }}"
+
+    # - name: Install maas test db
+    #   ansible.builtin.shell: "sudo snap install maas-test-db"
+    - name: Install maas test db
+      community.general.snap:
+        name: maas-test-db
+
+    # - name: Setup maas channel
+    #   ansible.builtin.shell: "sudo snap install maas --channel=3.3/stable"
+
+    - name: Setup maas channel
+      community.general.snap:
+        name: maas
+        channel: 3.3/stable
+
+    - name: Initialize maas
+      ansible.builtin.shell: "echo yes|sudo maas init region+rack --maas-url http://{{ maas_host }}:5240/MAAS --database-uri maas-test-db:///"
+
+    # - name: Create maas admin user
+    #   ansible.builtin.shell: "sudo maas createadmin --username admin --password ubuntu --email admin@example.com"
+
+    - name: MAAS status
+      ansible.builtin.shell: "sudo maas status"
