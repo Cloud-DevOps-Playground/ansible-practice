@@ -2,8 +2,8 @@ all:
  children:
   maas-server:
     vars:
-      maas_host: 65.0.85.233
+      maas_host:
     hosts:
-      ec2-65-0-85-233.ap-south-1.compute.amazonaws.com:
-        ansible_host: 65.0.85.233
-        ansible_ssh_private_key_file: /python/id_ed25519_aws.pem
+      maas-host:
+        ansible_host:
+        ansible_ssh_private_key_file: ./id_ed25519_aws.pem

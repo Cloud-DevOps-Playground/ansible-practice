@@ -22,12 +22,45 @@
       community.general.snap:
         name: maas
         channel: 3.3/stable
+        state: present
 
+      notify:
+        - Initialize maas
+        - Create maas admin user
+        - Export MAAS API key
+        - MAAS login
+        - Configure MAAS DNS
+        - Generate ssh key
+        - Add an SSH key to MAAS
+
+
+    - name: Add pause to let the services start
+      ansible.builtin.pause:
+        minutes: 2
+
+
+    # - name: MAAS status
+    #   ansible.builtin.shell: "sudo maas status"
+
+  handlers:
     - name: Initialize maas
       ansible.builtin.shell: "echo yes|sudo maas init region+rack --maas-url http://{{ maas_host }}:5240/MAAS --database-uri maas-test-db:///"
+      # ansible.builtin.shell: "echo yes|sudo maas init region+rack --database-uri maas-test-db:///"
 
-    # - name: Create maas admin user
-    #   ansible.builtin.shell: "sudo maas createadmin --username admin --password ubuntu --email admin@example.com"
+    - name: Create maas admin user
+      ansible.builtin.shell: "sudo maas createadmin --username=admin --password=ubuntu --email=admin@example.com"
 
-    - name: MAAS status
-      ansible.builtin.shell: "sudo maas status"
+    - name: Export MAAS API key
+      ansible.builtin.shell: "sudo maas apikey --username admin > ~/.maas-admin-api-key"
+
+    - name: MAAS login
+      ansible.builtin.shell: "maas login admin http://localhost:5240/MAAS $(cat ~/.maas-admin-api-key)"
+
+    - name: Configure MAAS DNS
+      ansible.builtin.shell: maas admin maas set-config name=upstream_dns value="8.8.8.8"
+
+    - name: Generate ssh key
+      ansible.builtin.shell: ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -q -N "" -C "maas-admin@maas-server.com"
+
+    - name: Add an SSH key to MAAS
+      ansible.builtin.shell: maas admin sshkeys create "key=$(cat ~/.ssh/id_ed25519.pub)"
