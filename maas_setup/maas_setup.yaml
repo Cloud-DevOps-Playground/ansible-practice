@@ -16,12 +16,11 @@
         name: maas-test-db
 
     # - name: Setup maas channel
-    #   ansible.builtin.shell: "sudo snap install maas --channel=3.3/stable"
-
+    #   ansible.builtin.shell: "sudo snap install maas --channel=3.6/stable"
     - name: Setup maas channel
       community.general.snap:
         name: maas
-        channel: 3.3/stable
+        channel: 3.6/stable
         state: present
 
       notify:
